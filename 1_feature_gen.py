@@ -2,9 +2,8 @@ import requests
 import pandas as pd
 import private
 import datetime
-import os
 import hopsworks
-import typing
+import os
 
 """
 Retreive air pollution data from OpenWeather API, generate features,
@@ -20,7 +19,7 @@ city = 'Chicago'
 This function will determine the start date for the GET request
 to OpenWeather. Returns tuple with date parameters, (yyyy, mm, dd).
 """
-def determineNewestAQIDate(fg_name: str = '60603_Chicago_AQI') -> datetime:
+def determineNewestAQIDate(fg_name: str = '60603_Chicago_AQI') -> datetime.datetime:
     fg_exists = False
 
     try:
@@ -59,4 +58,36 @@ def getCoords(zip: str = '60603,US') -> tuple(str, str):
     lat = geo_loc_response_json['lat']
     lon = geo_loc_response_json['lon']
 
-    return (lat, lon)   
+    return (lat, lon)
+
+"""
+GET AQI data for a given date range and coordinate. Returns
+Pandas DataFrame.
+"""
+def getAQI(start_date: datetime.datetime, end_date: datetime.datetime, lat: str, lon: str) -> pd.DataFrame:
+    start_unix = int(datetime.datetime.timestamp(start_date))
+    end_unix = int(datetime.datetime.timestamp(end_date))
+
+    aqi_url = 'http://api.openweathermap.org/data/2.5/air_pollution/history'
+    params = {'lat': lat, 'lon': lon, 'start': start_unix, 'end': end_unix, 'appid': private.MY_API_KEY}
+
+    aqi_response = requests.get(aqi_url, params=params)
+    aqi_resp_json = aqi_response.json()
+
+    """
+    Extract data from AQI response.
+    """
+    coord = aqi_resp_json['coord']  # latitude and longitude from aqi response
+    dates = [datetime.datetime.fromtimestamp(d['dt']) for d in aqi_resp_json['list']]
+    aqis = [x['main']['aqi'] for x in aqi_resp_json['list']]
+    pollutants = [x['components'] for x in aqi_resp_json['list']]
+
+    data = pd.DataFrame(pollutants)
+    data['datetime'] = dates
+    data['date'] = data['datetime'].dt.date
+    data['lat'] = coord[0]
+    data['lon'] = coord[1]
+    data['aqi'] = aqis
+
+    data_path = os.path.join('data', 'historical_aqi.csv')  # save data to my disk
+    data.to_csv(data_path, index=False)
