@@ -1,9 +1,5 @@
-import requests
 import pandas as pd
-import private
 import datetime
-import hopsworks
-import os
 from my_functions import determineNewestAQIDate
 from my_functions import getAQI
 from my_functions import getCoords
@@ -20,3 +16,11 @@ city = 'Chicago'
 
 fg_name = f'{zip_code}_{city}_AQI'
 start_date = determineNewestAQIDate(fg_name)
+end_date = datetime.datetime.now() - datetime.timedelta(hours=2)
+
+zip_code_api = f'{zip_code},{country_code}'
+coords = getCoords(zip_code_api)
+
+data = getAQI(start_date, end_date, coords[0], coords[1], fg_name)
+
+print(data.head())

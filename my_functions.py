@@ -39,7 +39,7 @@ def determineNewestAQIDate(fg_name: str = '60603_Chicago_AQI') -> datetime.datet
 GET coordinates for a given zip code from OpenWeather. Returns
 tuple of latitude and longitude coords, (lat, lon).
 """
-def getCoords(zip: str = '60603,US') -> tuple(str, str):
+def getCoords(zip_code: str = '60603,US') -> tuple:
     geo_loc_url = f'http://api.openweathermap.org/geo/1.0/zip'
     params = {'zip': zip_code, 'appid': private.MY_API_KEY}
 
@@ -76,9 +76,11 @@ def getAQI(start_date: datetime.datetime, end_date: datetime.datetime, lat: str,
     data = pd.DataFrame(pollutants)
     data['datetime'] = dates
     data['date'] = data['datetime'].dt.date
-    data['lat'] = coord[0]
-    data['lon'] = coord[1]
+    data['lat'] = coord['lat']
+    data['lon'] = coord['lon']
     data['aqi'] = aqis
 
     data_path = os.path.join('data', f'{fg_name}.csv')  # save data to my disk
     data.to_csv(data_path, index=False)
+
+    return data
