@@ -12,22 +12,19 @@ to OpenWeather. Returns tuple with date parameters, (yyyy, mm, dd).
 """
 def determineNewestAQIDate(fs, fg_name: str) -> datetime.datetime:
     try:
-        fg = fs.get_feature_group(name=fg_name)
-
-        newest_date = fg['datetime'].max()
-        
-        return newest_date
+        newest_date = fs.sql(f"SELECT MAX(`datetime`) FROM `aqipredictionservice_featurestore`.`{fg_name}_1`", online=True).values[0][0]
+        newest_date = pd.to_datetime(newest_date)
     except:
-        print(f'Feature view {fg_name} doesn\'t exist.')
+        """
+        If the above throws an exception, the feature group doesn't exist
+        and so we need to create it. Therefore the start date is going
+        to the be oldest date that OpenWeather has for AQI data, which
+        is 2020 November 27 00:00:00.
+        """
+        newest_date = datetime.datetime(2020, 11, 27, 0, 0 ,0)
+        print(f'Feature group {fg_name} doesn\'t exist.')
 
-    """
-    If the above throws an exception, the feature group doesn't exist
-    and so we need to create it. Therefore the start date is going
-    to the be oldest date that OpenWeather has for AQI data, which
-    is 2020 November 27 00:00:00.
-    """
-    newest_date = datetime.datetime(2020, 11, 27, 0, 0 ,0)
-
+    print(f'Newest feature vector date is: {newest_date}.')
     return newest_date
  
 
@@ -35,7 +32,7 @@ def determineNewestAQIDate(fs, fg_name: str) -> datetime.datetime:
 GET coordinates for a given zip code from OpenWeather. Returns
 tuple of latitude and longitude coords, (lat, lon).
 """
-def getCoords(zip_code: str = '60603,US') -> dict:
+def getCoords(zip_code: str) -> dict:
     geo_loc_url = f'http://api.openweathermap.org/geo/1.0/zip'
     params = {'zip': zip_code, 'appid': private.MY_API_KEY}
 
@@ -72,8 +69,5 @@ def getAQI(start_date: datetime.datetime, end_date: datetime.datetime, lat: str,
     data['lat'] = coord['lat']
     data['lon'] = coord['lon']
     data['aqi'] = aqis
-
-    data_path = os.path.join('data', f'{fg_name}.csv')  # save data to my disk
-    data.to_csv(data_path, index=False)
 
     return data
