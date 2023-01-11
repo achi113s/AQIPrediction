@@ -10,12 +10,8 @@ import os
 This function will determine the start date for the GET request
 to OpenWeather. Returns tuple with date parameters, (yyyy, mm, dd).
 """
-def determineNewestAQIDate(fg_name: str = '60603_Chicago_AQI') -> datetime.datetime:
-    fg_exists = False
-
+def determineNewestAQIDate(fs, fg_name: str) -> datetime.datetime:
     try:
-        project = hopsworks.login()
-        fs = project.get_feature_store()
         fg = fs.get_feature_group(name=fg_name)
 
         newest_date = fg['datetime'].max()
@@ -39,17 +35,14 @@ def determineNewestAQIDate(fg_name: str = '60603_Chicago_AQI') -> datetime.datet
 GET coordinates for a given zip code from OpenWeather. Returns
 tuple of latitude and longitude coords, (lat, lon).
 """
-def getCoords(zip_code: str = '60603,US') -> tuple:
+def getCoords(zip_code: str = '60603,US') -> dict:
     geo_loc_url = f'http://api.openweathermap.org/geo/1.0/zip'
     params = {'zip': zip_code, 'appid': private.MY_API_KEY}
 
     geo_loc_response = requests.get(geo_loc_url, params=params)
     geo_loc_response_json = geo_loc_response.json()
 
-    lat = geo_loc_response_json['lat']
-    lon = geo_loc_response_json['lon']
-
-    return (lat, lon)
+    return dict(geo_loc_response_json)
 
 """
 GET AQI data for a given date range and coordinate. Returns
