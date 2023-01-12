@@ -19,7 +19,7 @@ zip_code = '60603'  # Chicago
 country_code = 'US'
 city = 'Chicago'
 
-fg_name = f'{city}_{zip_code}_aqi'.lower()
+fg_name = f'{city}_{zip_code}'.lower()
 start_date = determineNewestAQIDate(fs, fg_name)
 end_date = datetime.datetime.now() - datetime.timedelta(hours=2)  # subtract two hours to add a lag
 
@@ -45,10 +45,17 @@ aqi_fg = fs.get_or_create_feature_group(
     name=fg_name,
     version=1,
     description=f'historical air quality index with predictors for {fg_name}',
-    primary_key=['datetime'],  
+    primary_key=['id'],  
     event_time='datetime',
     partition_key=['date'],
     online_enabled=True
 )
 
 aqi_fg.insert(data)
+
+
+# Exception has occurred: RestAPIError
+# Metadata operation error: (url: https://c.app.hopsworks.ai/hopsworks-api/api/project/13468/featurestores/13388/featuregroups). Server response: 
+# HTTP code: 500, HTTP reason: Internal Server Error, error code: 270063, error msg: Could not get JDBC connection for the online featurestore, user msg: Problem getting secrets for the JDBC connection to the online FS
+#   File "/Users/giorgio/CodingProjects/AQIPrediction/1_feature_gen.py", line 54, in <module>
+#     aqi_fg.insert(data)

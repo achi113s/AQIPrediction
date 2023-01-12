@@ -21,7 +21,7 @@ def determineNewestAQIDate(fs, fg_name: str) -> datetime.datetime:
         to the be oldest date that OpenWeather has for AQI data, which
         is 2020 November 27 00:00:00.
         """
-        newest_date = datetime.datetime(2020, 11, 27, 0, 0 ,0)
+        newest_date = datetime.datetime(2022, 11, 27, 0, 0 ,0)
         print(f'Feature group {fg_name} doesn\'t exist.')
 
     print(f'Newest feature vector date is: {newest_date}.')
@@ -69,5 +69,6 @@ def getAQI(start_date: datetime.datetime, end_date: datetime.datetime, lat: str,
     data['lat'] = coord['lat']
     data['lon'] = coord['lon']
     data['aqi'] = aqis
+    data['id'] = data.index
 
     return data
