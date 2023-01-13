@@ -13,7 +13,7 @@ to OpenWeather. Returns tuple with date parameters, (yyyy, mm, dd).
 def determineNewestAQIDate(fs, fg_name: str) -> tuple:
     try:
         newest_date = fs.sql(f"SELECT MAX(`datetime`) FROM `{fg_name}_1`", online=True).values[0][0]
-        newest_date_id = fs.sql(f"SELECT MAX(`id`) FROM `{fg_name}_1`", online=True).values[0][0] + 1
+        newest_date_id = fs.sql(f"SELECT MAX(`id`) FROM `{fg_name}_1`", online=True).values[0][0]
         newest_date = pd.to_datetime(newest_date)
     except:
         """
@@ -26,7 +26,7 @@ def determineNewestAQIDate(fs, fg_name: str) -> tuple:
         newest_date_id = 0
         print(f'Feature group {fg_name} doesn\'t exist.')
 
-    print(f'Newest feature vector date is: {newest_date} with ID: {newest_date_id-1}.')
+    print(f'Newest feature vector date is: {newest_date} with ID: {newest_date_id}.')
     
     return (newest_date_id, newest_date)
  

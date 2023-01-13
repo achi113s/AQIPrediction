@@ -20,9 +20,12 @@ country_code = 'US'
 city = 'Chicago'
 
 fg_name = f'aqi_{city}_{zip_code}'.lower()
+
 start_date_tup = determineNewestAQIDate(fs, fg_name)
 start_date = start_date_tup[1] + datetime.timedelta(hours=1)
-end_date = datetime.datetime.now() - datetime.timedelta(hours=2)  # subtract two hours to add a lag
+start_date_id = start_date_tup[0] + 1
+
+end_date = datetime.datetime.now() - datetime.timedelta(hours=3)  # subtract two hours to add a lag
 
 """
 If the start date is greater than or equal to the end date, we have the 
@@ -34,7 +37,7 @@ if start_date >= end_date:
 zip_code_api = f'{zip_code},{country_code}'
 coords = getCoords(zip_code_api)
 
-data = getAQI(start_date, end_date, coords['lat'], coords['lon'], fg_name, start_date_id=start_date_tup[0])
+data = getAQI(start_date, end_date, coords['lat'], coords['lon'], fg_name, start_date_id=start_date_id)
 
 data_path = os.path.join('data', f'{fg_name}.csv')  # save data to my disk
 data.to_csv(data_path, mode='a', index=False, header=not os.path.exists(data_path))
