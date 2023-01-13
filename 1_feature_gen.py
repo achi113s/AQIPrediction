@@ -19,8 +19,9 @@ zip_code = '60603'  # Chicago
 country_code = 'US'
 city = 'Chicago'
 
-fg_name = f'{city}_{zip_code}'.lower()
-start_date = determineNewestAQIDate(fs, fg_name)
+fg_name = f'aqi_{city}_{zip_code}'.lower()
+start_date_tup = determineNewestAQIDate(fs, fg_name)
+start_date = start_date_tup[1] + datetime.timedelta(hours=1)
 end_date = datetime.datetime.now() - datetime.timedelta(hours=2)  # subtract two hours to add a lag
 
 """
@@ -33,7 +34,7 @@ if start_date >= end_date:
 zip_code_api = f'{zip_code},{country_code}'
 coords = getCoords(zip_code_api)
 
-data = getAQI(start_date, end_date, coords['lat'], coords['lon'], fg_name)
+data = getAQI(start_date, end_date, coords['lat'], coords['lon'], fg_name, start_date_id=start_date_tup[0])
 
 data_path = os.path.join('data', f'{fg_name}.csv')  # save data to my disk
 data.to_csv(data_path, mode='a', index=False, header=not os.path.exists(data_path))
@@ -44,7 +45,7 @@ Upload data into a feature group.
 aqi_fg = fs.get_or_create_feature_group(
     name=fg_name,
     version=1,
-    description=f'historical air quality index with predictors for {fg_name}',
+    description=f'historical air quality index with predictors for {city},{zip_code},{country_code}',
     primary_key=['id'],  
     event_time='datetime',
     partition_key=['date'],
@@ -52,10 +53,3 @@ aqi_fg = fs.get_or_create_feature_group(
 )
 
 aqi_fg.insert(data)
-
-
-# Exception has occurred: RestAPIError
-# Metadata operation error: (url: https://c.app.hopsworks.ai/hopsworks-api/api/project/13468/featurestores/13388/featuregroups). Server response: 
-# HTTP code: 500, HTTP reason: Internal Server Error, error code: 270063, error msg: Could not get JDBC connection for the online featurestore, user msg: Problem getting secrets for the JDBC connection to the online FS
-#   File "/Users/giorgio/CodingProjects/AQIPrediction/1_feature_gen.py", line 54, in <module>
-#     aqi_fg.insert(data)
