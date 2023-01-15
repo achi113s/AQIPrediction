@@ -23,7 +23,7 @@ fg_name = f'aqi_{city}_{zip_code}'.lower()
 
 start_date_tup = determineNewestAQIDate(fs, fg_name)
 start_date = start_date_tup[1] + datetime.timedelta(hours=1)
-start_date_id = start_date_tup[0] + 1
+start_date_id = start_date_tup[0]
 
 end_date = datetime.datetime.now() - datetime.timedelta(hours=3)  # subtract two hours to add a lag
 
