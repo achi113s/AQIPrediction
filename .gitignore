@@ -3,3 +3,6 @@
 data
 private.py
 .hw_api_key
+ca_chain
+certfile
+keyfile
