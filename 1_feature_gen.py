@@ -39,6 +39,8 @@ coords = getCoords(zip_code_api)
 
 data = getAQI(start_date, end_date, coords['lat'], coords['lon'], fg_name, start_date_id=start_date_id)
 
+# insert function to verify the data is clean here
+# data = clean_data(data)
 data_path = os.path.join('data', f'{fg_name}.csv')  # save data to my disk
 data.to_csv(data_path, mode='a', index=False, header=not os.path.exists(data_path))
 
