@@ -3,6 +3,7 @@ import datetime
 from my_functions import determineNewestAQIDate
 from my_functions import getAQI
 from my_functions import getCoords
+from my_functions import cleanData
 import hopsworks
 import sys
 import os
@@ -22,7 +23,7 @@ city = 'Chicago'
 fg_name = f'aqi_{city}_{zip_code}'.lower()
 
 start_date_tup = determineNewestAQIDate(fs, fg_name)
-start_date = start_date_tup[1] + datetime.timedelta(hours=1)
+start_date = start_date_tup[1]
 start_date_id = start_date_tup[0]
 
 end_date = datetime.datetime.now() - datetime.timedelta(hours=3)  # subtract two hours to add a lag
@@ -39,8 +40,9 @@ coords = getCoords(zip_code_api)
 
 data = getAQI(start_date, end_date, coords['lat'], coords['lon'], fg_name, start_date_id=start_date_id)
 
-# insert function to verify the data is clean here
-# data = clean_data(data)
+# Get rid of duplicates and deal with missing values.
+data = cleanData(data, start_date_id)
+
 data_path = os.path.join('data', f'{fg_name}.csv')  # save data to my disk
 data.to_csv(data_path, mode='a', index=False, header=not os.path.exists(data_path))
 

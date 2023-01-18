@@ -14,7 +14,7 @@ def determineNewestAQIDate(fs, fg_name: str) -> tuple:
     try:
         newest_date = fs.sql(f"SELECT MAX(`datetime`) FROM `{fg_name}_1`", online=True).values[0][0]
         newest_date_id = fs.sql(f"SELECT MAX(`id`) FROM `{fg_name}_1`", online=True).values[0][0] + 1
-        newest_date = pd.to_datetime(newest_date)
+        newest_date = pd.to_datetime(newest_date) + datetime.timedelta(hours=1)
     except:
         """
         If the above throws an exception, the feature group doesn't exist
@@ -26,7 +26,7 @@ def determineNewestAQIDate(fs, fg_name: str) -> tuple:
         newest_date_id = 0
         print(f'Feature group {fg_name} doesn\'t exist.')
 
-    print(f'Newest feature vector date is: {newest_date} with ID: {newest_date_id-1}.')
+    print(f'Newest feature vector date is: {newest_date} with ID: {newest_date_id}.')
     
     return (newest_date_id, newest_date)
  
@@ -75,3 +75,26 @@ def getAQI(start_date: datetime.datetime, end_date: datetime.datetime, lat: str,
     data['id'] = range(start_date_id, start_date_id+len(data['aqi']))
 
     return data
+
+
+"""
+Takes in a dataframe and cleans it according to needs. Sometimes we get
+duplicate entries in the AQI data and these need to be fixed. For example, 
+these two rows:
+327.11,0.0,17.82,67.23,6.26,10.14,12.73,1.55,2021-11-07 01:00:00,2021-11-07,41.8798,-87.6285,2,8256
+317.1,0.0,15.94,67.23,6.26,9.71,11.87,1.28,2021-11-07 01:00:00,2021-11-07,41.8798,-87.6285,1,8257
+are from the same timestamp. We're dealing with thousands of data points,
+so just keep the first one and discard any duplicates.
+"""
+def cleanData(df: pd.DataFrame, start_date_id: int) -> pd.DataFrame:
+    duplicates = df[df.duplicated(subset=['datetime'])]
+    print('Duplicates: ', duplicates)
+
+    df = df.drop_duplicates(subset=['datetime'], keep='first')
+    
+    df = df.drop(columns=['id'])
+    df['id'] = range(start_date_id, start_date_id+len(df['aqi']))
+
+    df = df.fillna(method='ffill')
+
+    return df
