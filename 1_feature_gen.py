@@ -60,3 +60,23 @@ aqi_fg = fs.get_or_create_feature_group(
 )
 
 aqi_fg.insert(data)
+
+feature_descriptions = [
+    {"name": "co", "description": "carbon monoxide concentration in micrograms per cubic meter"},
+    {"name": "no", "description": "nitrogen monoxide concentration in micrograms per cubic meter"},
+    {"name": "no2", "description": "nitrogen dioxide concentration in micrograms per cubic meter"},
+    {"name": "o3", "description": "ozone concentration in micrograms per cubic meter"},
+    {"name": "so2", "description": "sulfur dioxide concentration in micrograms per cubic meter"},
+    {"name": "pm2_5", "description": "particulates concentration in micrograms per cubic meter"},
+    {"name": "pm10", "description": "particulates concentration in micrograms per cubic meter"},
+    {"name": "nh3", "description": "ammonia concentration in micrograms per cubic meter"},
+    {"name": "datetime", "description": "timestamp of data"},
+    {"name": "date", "description": "date of data, used for partition key"},
+    {"name": "lat", "description": "latitude of location"},
+    {"name": "lon", "description": "longitude of location"},   
+    {"name": "aqi", "description": "air quality index"},   
+    {"name": "id", "description": "id number"}  
+]
+
+for desc in feature_descriptions: 
+    aqi_fg.update_feature_description(desc["name"], desc["description"])
