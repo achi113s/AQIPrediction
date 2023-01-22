@@ -124,17 +124,9 @@ def createFeatures(data: pd.DataFrame) -> pd.DataFrame:
         # lag feature by 3 days
         new_feature_name = feature + '_lag3d'
         df[new_feature_name] = df[feature].shift(freq='3D', axis=0)
-
-        # lag feature by 5 days
-        new_feature_name = feature + '_lag5d'
-        df[new_feature_name] = df[feature].shift(freq='5D', axis=0)
-
-        # lag feature by 9 days
-        new_feature_name = feature + '_lag9d'
-        df[new_feature_name] = df[feature].shift(freq='9D', axis=0)
         
         
-    window = 12  # hours
+    window = 24  # hours
     df['aqi_max_lag_3d'] = df['aqi'].rolling(window=window).agg(['max']).shift(freq='3D', axis=0)
     df['aqi_mean_lag_3d'] = df['aqi'].rolling(window=window).agg(['mean']).shift(freq='3D', axis=0)
     df['aqi_std_lag_3d'] = df['aqi'].rolling(window=window).agg(['std']).shift(freq='3D', axis=0)
