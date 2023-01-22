@@ -98,6 +98,7 @@ target = 'aqi'
 x_all = df[features]
 y_all = df[target]
 
+print('Starting XGBoost training...')
 clf = xgb.XGBClassifier(n_estimators=1000, 
                         booster='gbtree',
                         early_stopping_rounds=50,
@@ -106,6 +107,7 @@ clf = xgb.XGBClassifier(n_estimators=1000,
                        )
 
 clf.fit(x_all, y_all, eval_set=[(x_all, y_all)])
+print('End XGBoost training.')
 
 # dump model
 # The 'aqi_model' directory will be saved to the model registry
@@ -117,8 +119,8 @@ joblib.dump(clf, model_dir + '/xgboost_aqi_model.pkl')
 
 mr = project.get_model_registry()
 
-input_schema = Schema(future_w_features[features])
-output_schema = Schema(future_w_features[target])
+input_schema = Schema(df[features])
+output_schema = Schema(df[target])
 model_schema = ModelSchema(input_schema=input_schema, output_schema=output_schema)
 
 model_schema.to_dict()
@@ -126,7 +128,7 @@ model_schema.to_dict()
 aqi_model = mr.python.create_model(
     name='xgboost_aqi_model', 
     model_schema=model_schema,
-    input_example=future_w_features[features].sample().to_numpy(), 
+    input_example=df[features].sample().to_numpy(), 
     description="AQI Predictor")
 
 aqi_model.save(model_dir)
