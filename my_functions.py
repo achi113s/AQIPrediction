@@ -98,3 +98,48 @@ def cleanData(df: pd.DataFrame, start_date_id: int) -> pd.DataFrame:
     df = df.fillna(method='ffill')
 
     return df
+
+
+"""
+Perform feature engineering on the historical data and
+drop the historical features. Should have the future timestamps
+in there when calling this function so you only have to do it once.
+"""
+def createFeatures(data: pd.DataFrame) -> pd.DataFrame:
+    df = data.copy()
+    # add date features
+    df['hour'] = df.index.hour
+    df['dayofweek'] = df.index.dayofweek
+    df['quarter'] = df.index.quarter
+    df['month'] = df.index.month
+    df['year'] = df.index.year
+    df['dayofyear'] = df.index.dayofyear
+    df['dayofmonth'] = df.index.day
+    df['weekofyear'] = df.index.isocalendar().week.astype('int')
+    
+    # add lag features
+    features_to_lag = ['co', 'no', 'no2', 'o3', 'so2', 'pm2_5', 'pm10', 'nh3', 'aqi']
+
+    for feature in features_to_lag:
+        # lag feature by 3 days
+        new_feature_name = feature + '_lag3d'
+        df[new_feature_name] = df[feature].shift(freq='3D', axis=0)
+
+        # lag feature by 5 days
+        new_feature_name = feature + '_lag5d'
+        df[new_feature_name] = df[feature].shift(freq='5D', axis=0)
+
+        # lag feature by 9 days
+        new_feature_name = feature + '_lag9d'
+        df[new_feature_name] = df[feature].shift(freq='9D', axis=0)
+        
+        
+    window = 12  # hours
+    df['aqi_max_lag_3d'] = df['aqi'].rolling(window=window).agg(['max']).shift(freq='3D', axis=0)
+    df['aqi_mean_lag_3d'] = df['aqi'].rolling(window=window).agg(['mean']).shift(freq='3D', axis=0)
+    df['aqi_std_lag_3d'] = df['aqi'].rolling(window=window).agg(['std']).shift(freq='3D', axis=0)
+    
+    # drop the historical features
+    df = df.drop(columns=['co', 'no', 'no2', 'o3', 'so2', 'pm2_5', 'pm10', 'nh3'])
+    
+    return df
