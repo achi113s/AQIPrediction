@@ -4,6 +4,7 @@ import xgboost as xgb
 import joblib
 import os
 import sys
+import datetime
 
 zip_code = '60603'  # Chicago
 country_code = 'US'
@@ -20,6 +21,7 @@ else:
 
 # create all of the features needed for training
 df = createFeatures(df)
+df['aqi'] = df['aqi'] - 1
 
 # train model
 features = ['hour', 'dayofweek', 'quarter', 'month', 'year', 'dayofyear',
@@ -42,10 +44,12 @@ clf = xgb.XGBClassifier(n_estimators=1000,
 clf.fit(x_all, y_all, eval_set=[(x_all, y_all)])
 print('End XGBoost training.')
 
-# dump model
-# The 'aqi_model' directory will be saved to the model registry
+# Save model.
 model_dir = 'aqi_model'
 if os.path.isdir(model_dir) == False:
     os.mkdir(model_dir)
-    
-joblib.dump(clf, model_dir + '/xgboost_aqi_model.pkl')
+
+model_name = 'xgboost_aqi_model.json'
+model_path = os.path.join(model_dir, model_name)
+
+clf.save_model(model_path)
