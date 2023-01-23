@@ -78,10 +78,18 @@ def get_forecast():
 with gr.Blocks() as demo:
     gr.Markdown(
     """
-    **Air Quality Index Prediction 📈 with XGBoost Forecasting**: See recent air quality in Chicago and a 3-day forecast!
+    **Air Quality Index (AQI) Prediction 📈 with XGBoost Forecasting**: See recent air quality in Chicago and a 3-day forecast!
     """)
 
     gr_plt = gr.Plot()
+
+    gr.Markdown(
+    """
+    **Description**: The air quality index is based on the concentration of a number of pollutants such as ozone, ammonia, and particulates. 
+    I trained an XGBoostClassifier model using a little over two years' worth of historical data from OpenWeather. Then I predict the next three days
+    of air quality indices at an hourly resolution. Because the XGBoostClassifier has some degree of stochasticity, predictions may change from 
+    session to session. New data is downloaded daily, and the model is automatically retrained every other day.
+    """)
 
     demo.load(fn=get_forecast, outputs=[gr_plt], queue=False)    
 
