@@ -128,7 +128,6 @@ model_schema.to_dict()
 aqi_model = mr.python.create_model(
     name='xgboost_aqi_model', 
     model_schema=model_schema,
-    input_example=df[features].sample().to_numpy(), 
     description="AQI Predictor")
 
 aqi_model.save(model_dir)
