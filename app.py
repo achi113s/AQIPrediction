@@ -87,8 +87,8 @@ with gr.Blocks() as demo:
     """
     **Description**: The air quality index is based on the concentration of a number of pollutants such as ozone, ammonia, and particulates. 
     I trained an XGBoostClassifier model using a little over two years' worth of historical data from OpenWeather. Then I predict the next three days
-    of air quality indices at an hourly resolution. Because the XGBoostClassifier has some degree of stochasticity, predictions may change from 
-    session to session. New data is downloaded daily, and the model is automatically retrained every other day.
+    of air quality indices at an hourly resolution. Because training an XGBoostClassifier has some degree of stochasticity, predictions for a particular
+    time may change after the model is retrained. New data is downloaded daily, and the model is automatically retrained every other day.
     """)
 
     demo.load(fn=get_forecast, outputs=[gr_plt], queue=False)    
