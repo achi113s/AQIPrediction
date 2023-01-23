@@ -2,34 +2,6 @@ import requests
 import pandas as pd
 import private
 import datetime
-import hopsworks
-import os
-
-
-"""
-This function will determine the start date for the GET request
-to OpenWeather. Returns tuple with date parameters, (yyyy, mm, dd).
-"""
-def determineNewestAQIDate(fs, fg_name: str) -> tuple:
-    try:
-        newest_date = fs.sql(f"SELECT MAX(`datetime`) FROM `{fg_name}_1`", online=True).values[0][0]
-        newest_date_id = fs.sql(f"SELECT MAX(`id`) FROM `{fg_name}_1`", online=True).values[0][0] + 1
-        newest_date = pd.to_datetime(newest_date) + datetime.timedelta(hours=1)
-    except:
-        """
-        If the above throws an exception, the feature group doesn't exist
-        and so we need to create it. Therefore the start date is going
-        to the be oldest date that OpenWeather has for AQI data, which
-        is 2020 November 27 00:00:00.
-        """
-        newest_date = datetime.datetime(2020, 11, 27, 0, 0 ,0)
-        newest_date_id = 0
-        print(f'Feature group {fg_name} doesn\'t exist.')
-
-    print(f'Newest feature vector date is: {newest_date} with ID: {newest_date_id}.')
-    
-    return (newest_date_id, newest_date)
- 
 
 """
 GET coordinates for a given zip code from OpenWeather. Returns
@@ -48,7 +20,7 @@ def getCoords(zip_code: str) -> dict:
 GET AQI data for a given date range and coordinate. Returns
 Pandas DataFrame.
 """
-def getAQI(start_date: datetime.datetime, end_date: datetime.datetime, lat: str, lon: str, fg_name: str, start_date_id: int=0) -> pd.DataFrame:
+def getAQI(start_date: datetime.datetime, end_date: datetime.datetime, lat: str, lon: str, start_date_id: int=0) -> pd.DataFrame:
     start_unix = int(datetime.datetime.timestamp(start_date))
     end_unix = int(datetime.datetime.timestamp(end_date))
 
@@ -68,7 +40,6 @@ def getAQI(start_date: datetime.datetime, end_date: datetime.datetime, lat: str,
 
     data = pd.DataFrame(pollutants)
     data['datetime'] = dates
-    data['date'] = data['datetime'].dt.date
     data['lat'] = coord['lat']
     data['lon'] = coord['lon']
     data['aqi'] = aqis
