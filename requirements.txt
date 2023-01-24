@@ -1,0 +1,5 @@
+gradio==3.16.2
+scikit-learn==1.2.1
+plotly==5.13.0
+pandas==1.5.3
+xgboost==1.7.3
