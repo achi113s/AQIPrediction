@@ -1,10 +1,23 @@
 import pandas as pd
 from my_functions import createFeatures
 import xgboost as xgb
-import joblib
 import os
 import sys
-import datetime
+import logging
+import logging.handlers
+
+# set up logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger_file_handler = logging.handlers.RotatingFileHandler(
+    "status.log",
+    maxBytes=1024 * 1024,
+    backupCount=1,
+    encoding="utf8",
+)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger_file_handler.setFormatter(formatter)
+logger.addHandler(logger_file_handler)
 
 zip_code = '60603'  # Chicago
 country_code = 'US'
@@ -16,7 +29,8 @@ data_path = os.path.join('data', f'{aqi_table_name}.csv')
 
 if os.path.exists(data_path):
     df = pd.read_csv(data_path, index_col='datetime', parse_dates=True)
-else: 
+else:
+    logger.info(f'{aqi_table_name} doesn\'t exist. Quitting now...') 
     sys.exit(f'{aqi_table_name} doesn\'t exist. Quitting now...')
 
 # create all of the features needed for training
@@ -33,7 +47,7 @@ target = 'aqi'
 x_all = df[features]
 y_all = df[target]
 
-print('Starting XGBoost training...')
+logger.info(f'Starting XGBoost training...') 
 clf = xgb.XGBClassifier(n_estimators=1000, 
                         booster='gbtree',
                         early_stopping_rounds=50,
@@ -42,7 +56,7 @@ clf = xgb.XGBClassifier(n_estimators=1000,
                        )
 
 clf.fit(x_all, y_all, eval_set=[(x_all, y_all)])
-print('End XGBoost training.')
+logger.info(f'Done training XGBoost.') 
 
 # Save model.
 model_dir = 'aqi_model'
@@ -53,3 +67,4 @@ model_name = 'xgboost_aqi_model.json'
 model_path = os.path.join(model_dir, model_name)
 
 clf.save_model(model_path)
+logger.info(f'Saved new XGBoost model.') 

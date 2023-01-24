@@ -1,15 +1,14 @@
 import requests
 import pandas as pd
-import private
 import datetime
 
 """
 GET coordinates for a given zip code from OpenWeather. Returns
 tuple of latitude and longitude coords, (lat, lon).
 """
-def getCoords(zip_code: str) -> dict:
+def getCoords(zip_code: str, api_key: str) -> dict:
     geo_loc_url = f'http://api.openweathermap.org/geo/1.0/zip'
-    params = {'zip': zip_code, 'appid': private.MY_API_KEY}
+    params = {'zip': zip_code, 'appid': api_key}
 
     geo_loc_response = requests.get(geo_loc_url, params=params)
     geo_loc_response_json = geo_loc_response.json()
@@ -20,12 +19,12 @@ def getCoords(zip_code: str) -> dict:
 GET AQI data for a given date range and coordinate. Returns
 Pandas DataFrame.
 """
-def getAQI(start_date: datetime.datetime, end_date: datetime.datetime, lat: str, lon: str, start_date_id: int=0) -> pd.DataFrame:
+def getAQI(start_date: datetime.datetime, end_date: datetime.datetime, lat: str, lon: str, api_key: str, start_date_id: int=0) -> pd.DataFrame:
     start_unix = int(datetime.datetime.timestamp(start_date))
     end_unix = int(datetime.datetime.timestamp(end_date))
 
     aqi_url = 'http://api.openweathermap.org/data/2.5/air_pollution/history'
-    params = {'lat': lat, 'lon': lon, 'start': start_unix, 'end': end_unix, 'appid': private.MY_API_KEY}
+    params = {'lat': lat, 'lon': lon, 'start': start_unix, 'end': end_unix, 'appid': api_key}
 
     aqi_response = requests.get(aqi_url, params=params)
     aqi_resp_json = aqi_response.json()
