@@ -79,6 +79,7 @@ with gr.Blocks() as demo:
     gr.Markdown(
     """
     **Air Quality Index (AQI) Prediction 📈 with XGBoost Forecasting**: See recent air quality in Chicago and a 3-day forecast!
+    [GitHub Repo](https://github.com/achi113s/AQIPrediction)
     """)
 
     gr_plt = gr.Plot()
