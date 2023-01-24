@@ -88,7 +88,12 @@ with gr.Blocks() as demo:
     **Description**: The air quality index is based on the concentration of a number of pollutants such as ozone, ammonia, and particulates. 
     I trained an XGBoostClassifier model using a little over two years' worth of historical data from OpenWeather. Then I predict the next three days
     of air quality indices at an hourly resolution. Because training an XGBoostClassifier has some degree of stochasticity, predictions for a particular
-    time may change after the model is retrained. New data is downloaded daily, and the model is automatically retrained every other day.
+    time may change after the model is retrained. New data is downloaded roughly every three days, and the model is automatically retrained. This is my
+    first machine learning project where I've gathered my own data and deployed a model. It is also the first time series forecasting project I've done.
+    Unfortunately, my model doesn't have the great of performance. The log-loss baseline for the training set is about 0.68 and I wasn't
+    able to get below that in cross-validation. This means that the model is no better than randomly guessing the air quality index.
+    However, I think with some better feature engineering the model could perform substantially better. Nevertheless, I've learned
+    so much about data science, machine learning, GitHub, Gradio, and Hugging Face Spaces with this project and that's what counts.
     """)
 
     demo.load(fn=get_forecast, outputs=[gr_plt], queue=False)    
