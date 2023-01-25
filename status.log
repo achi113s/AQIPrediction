@@ -8,3 +8,8 @@
 2023-01-24 13:46:44,906 - __main__ - INFO - Starting XGBoost training...
 2023-01-24 13:47:37,002 - __main__ - INFO - Done training XGBoost.
 2023-01-24 13:47:37,103 - __main__ - INFO - Saved new XGBoost model.
+2023-01-25 13:25:42,938 - __main__ - INFO - Environment API Key not available!
+2023-01-25 13:25:43,381 - __main__ - INFO - Downloaded AQI data for 2023-01-24 11:00:00 to 2023-01-25 10:00:00.
+2023-01-25 13:26:04,964 - __main__ - INFO - Starting XGBoost training...
+2023-01-25 13:26:58,043 - __main__ - INFO - Done training XGBoost.
+2023-01-25 13:26:58,144 - __main__ - INFO - Saved new XGBoost model.

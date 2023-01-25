@@ -1,5 +1,6 @@
 import pandas as pd
 from my_functions import createFeatures
+from sklearn.utils.class_weight import compute_sample_weight
 import xgboost as xgb
 import os
 import sys
@@ -50,12 +51,13 @@ y_all = df[target]
 logger.info(f'Starting XGBoost training...') 
 clf = xgb.XGBClassifier(n_estimators=1000, 
                         booster='gbtree',
-                        early_stopping_rounds=50,
                         max_depth=4,
                         learning_rate=0.01
                        )
 
-clf.fit(x_all, y_all, eval_set=[(x_all, y_all)])
+sample_weights = compute_sample_weight(class_weight='balanced', 
+                                       y=y_all)
+clf.fit(x_all, y_all, eval_set=[(x_all, y_all)], sample_weight=sample_weights)
 logger.info(f'Done training XGBoost.') 
 
 # Save model.
