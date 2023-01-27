@@ -7,7 +7,6 @@ import sys
 import os
 import logging
 import logging.handlers
-import private
 
 """
 Retreive air pollution data from OpenWeather API 
@@ -73,6 +72,7 @@ if start_date >= end_date:
 try:
     api_key = os.environ['OPENWEATHERAPIKEY']
 except KeyError:
+    import private
     api_key = private.MY_API_KEY
     logger.info('Environment API Key not available!')
 
